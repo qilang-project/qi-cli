@@ -1,15 +1,17 @@
 # Qi CLI
 
-`qi-cli` 是一个用 **Qi 语言**写的命令行框架，方向参考了 [spf13/cobra](https://github.com/spf13/cobra)：
+`qi-cli` 是一个用 **奇语（Qi）**写的命令行框架，方向参考了 [spf13/cobra](https://github.com/spf13/cobra)：
 
 - 命令树
 - 子命令
 - 局部参数
-- 持久参数
+- 持久参数（走 clap global，自动继承到子命令）
 - 自动帮助
-- 前置 / 后置执行钩子
+- 前置 / 后置 / 持久前置 / 持久后置执行钩子
 
 底层参数解析继续复用 `标准库.命令行`，上层则提供更接近 Cobra 的命令组织方式。
+
+> 📘 AI 辅助：本项目带 [`SKILL.md`](SKILL.md)，可作为 agent skill 安装，让 AI 助手准确生成 qi-cli 代码。
 
 ## 项目结构
 
