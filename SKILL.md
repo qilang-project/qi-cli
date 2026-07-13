@@ -3,7 +3,7 @@ name: qi-cli
 description: Build command-line tools in the Qi (奇语) programming language using the qi-cli framework — a Cobra-style command tree with subcommands, local/persistent flags, aliases, pre/post execution hooks, and auto-generated help. Use when the user writes Qi CLI apps, command-line tools, or asks about commands, subcommands, flags, or arguments in Qi. Requires the qi-lang skill for base language syntax.
 metadata:
   author: qilang
-  version: "0.1"
+  version: "0.2"
 ---
 
 # qi-cli — Qi 语言命令行框架
@@ -90,7 +90,11 @@ metadata:
 变量 开关: 整数 = 标志(上下文值, "详细");           // 0/1
 变量 有否: 整数 = 存在值(上下文值, "名字");
 变量 路径: 字符串 = 命令路径(上下文值);             // "应用 命令 子命令"
+变量 命令: 字符串 = 命令名(上下文值);               // 当前命令名
+变量 程序: 字符串 = 应用名(上下文值);               // 应用名
 ```
+
+访问器**只有这 7 个**（值/整数值/标志/存在值/命令名/命令路径/应用名）——没有 浮点值/布尔值/剩余参数；要浮点用 `字符串转浮点数(值(...))`。
 
 ## 子命令树
 
@@ -104,8 +108,10 @@ metadata:
 
 ## 标志参数注意
 
-- `参数标志` 的参数若没设 long/short，框架自动用参数名作长名（clap 要求 flag 必须有名）
+- 参数默认是**位置参数**；调 `参数标志` 才变成 flag。flag 若没设 long/short，框架自动用参数名作长名（clap 要求 flag 必须有名）
 - 持久参数 (`参数持久`) 用 clap 的 global 机制传到子命令，**不要**手动复制到每个子命令
+- `--help`/`-h`/`--version` 由底层 clap 后端自动提供（`应用版本` 注册的版本号即 --version 输出），qi-cli 不需要也没有手写帮助 API
+- 钩子顺序：各层 持久前置 自上而下 → 最深命令的 前置 → 执行 → 后置 → 持久后置；持久钩子拿到**最深匹配命令**的上下文
 
 ## 运行
 
