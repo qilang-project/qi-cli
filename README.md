@@ -99,9 +99,28 @@ cargo run -q -p qi-compiler -- compile qi-cli/examples/工具箱.qi -o /tmp/qi_c
 | `HTTP客户端.qi` | HTTP 模块、httpie 风格 | 获取 / 发送 / 更新 / 删除 / 状态 |
 | `待办.qi` | 持久 JSON 状态、字符串切分 | 添加 / 列表 / 完成 / 删除 / 清空 |
 | `系统信息.qi` | 操作系统 + 网络 + 加密组合 | 概览 / 环境 / 设置 / 网络 / 哈希字符串 |
-| `AI助手.qi` | 集成 qi-harness 调 DeepSeek | 问 / 流 / 翻译 / 总结 |
+| `AI助手.qi` | 集成 qi-harness 调 DeepSeek，默认支持 MCP | 问 / 流 / 翻译 / 总结 / mcp |
 
 跑 AI 示例需要先 `export QI_LLM_KEY=sk-...`。
+
+### AI助手 的 MCP 支持（默认）
+
+`AI助手.qi` 默认接入 [MCP](https://modelcontextprotocol.io)，让 AI 用外部服务器提供的工具作答：
+
+- **`mcp` 子命令**：显式接一个 MCP 服务器，默认连 `server-everything`（自带 echo/add 等演示工具）。
+  ```bash
+  export QI_LLM_KEY=sk-...
+  qi run examples/AI助手.qi mcp "用 echo 工具回显 hello world"
+  # 换服务器：--服务器 npx --参数 '["-y","@modelcontextprotocol/server-filesystem","."]'
+  ```
+- **`问` 命令自动接 MCP**：设了环境变量 `QI_MCP_命令`（可选 `QI_MCP_参数`）后，`问` 会自动挂上该服务器的工具，无需改命令。
+  ```bash
+  export QI_MCP_命令=npx
+  export QI_MCP_参数='["-y","@modelcontextprotocol/server-everything"]'
+  qi run examples/AI助手.qi 问 "帮我用工具算 12 加 30"
+  ```
+
+关键 API 来自 qi-harness：`连接MCP_stdio` 连服务器，`装备MCP(代理, 描述符)` 把工具挂到 agent，`运行` 触发工具调用循环，`关闭MCP` 收尾。
 
 ## 当前边界
 
